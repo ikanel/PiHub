@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>PiHub demostrator</title>
+    <style>
+
+        section {
+            width: 99%;
+            border: 0.1px solid black;
+            
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        div.textdump {
+            width: 100%;
+            font-family: monospace;
+            font-size: 8pt;
+            height: 200px; max-height: 300px; 
+            overflow: scroll
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 8pt;
+        }
+        header {
+            font-family: monospace;
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        div#folderInfo
+        {
+            font-family: monospace;
+            font-size: 9pt;
+            background-color: black;
+            color: white;
+            max-height: 300px;
+            width: 100%;
+            overflow: scroll;
+        }
+        div#folderInfo a
+        {
+            cursor:pointer;
+        }
+
+    </style>
+    <script src="~/js/Command.js"></script>
+    <script src="~/js/BlobCommand.js"></script>
+    <script src="~/js/MediaCommand.js"></script>
+    <script src="js/blobs.js"></script>
+</head>
+<body>
+    <h1>PiHub Demonstrator</h1>
+    <p id="stateLabel">Ready to connect...</p>
+    <div>
+        <label for="connectionUrl">WebSocket Server URL:</label>
+        <input id="connectionUrl" size="90" />
+        Pi Name:
+        <input id="piName" size="10" value="pi" />
+
+        <button id="connectButton" type="submit">Connect</button>
+        <button id="closeButton" disabled>Close Socket</button>
+    </div>
+    <p></p>
+<section id="commandSection">
+    <header>Command</header>
+    <div id="sendMessage" class="textdump" style="height: 100px" >Click on any command button below...</div>
+    value:<input type="text" style="width: 80%" id="commandValue"/>
+</section>
+    <div id="commandsDiv">
+      
+        <input type="file" id="file" />
+        
+        <button id="sendButton" type="submit" disabled>Send</button>
+        <br />
+    </div>
+    <section id="audioPlayerSection">
+        <audio id="audioPlayer" controls autoplay></audio>
+    </section>
+<section id="folderSection">
+    
+    <span id="fileLinkHolder"></span>
+    <header>Remote folder contents</header>
+    <div id="folderInfo"></div>
+</section>
+    <section id="gpioSection">
+        <header>GPIO Buttons</header>
+        <span id="hwiopanel"></span>   
+     </section>
+<section id="imageSection"><img id="picture" style="max-width: 90%" /></section>
+<section id="envSection">
+    Environment information:<span id="envCell"></span>
+    System information:<span id="sysCell"></span>
+</section>
+<section id="commsLogSection">
+    <h2>Communication Log</h2>
+    <div id="commsLog" class="textdump"></div>
+  </section>
+<script type="text/javascript">
+    var command = "";
+
+    function setCommand(value) {
+        command = value;
+        document.getElementById("sendMessage").innerHTML = JSON.stringify(value).substring(0, 300);
+        if (value.value != undefined && value.value != null) {
+            document.getElementById("commandValue").value = value.value;
+            }
+    }
+
+    function compileAndSendCommand() {
+        command.value = document.getElementById("commandValue").value;
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert("socket not connected");
+            return;
+        }
+        var commStr = JSON.stringify(command);
+        socket.send(commStr);
+
+        logCommunication(true, commStr.substring(0, 200));
+
+    }
+    function getPiId() {
+        return document.getElementById("piName").value;
+    }
+    var sendMessage = document.getElementById("sendMessage");
+    var sendButton = document.getElementById("sendButton");
+    var audioPlayer = document.getElementById("audioPlayer");
+
+    Command.prototype.recipientId = getPiId().split(",");
+    Command.prototype.files = document.getElementById('file');
+    var commands = [
+        new Command("GetFolder",
+            function(obj) {
+                setCommand(obj);
+                compileAndSendCommand();
+                //alert("Set value attribute to desired folder location and click 'send'");
+            },
+            "/"),
+        new Command("GetGpioPins",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to the comma-separated list of pins to be requested and click 'send'");
+            },
+            "1,2,3,4,5,6,7"),
+        new Command("SetGpioPins",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to the pins:0/1 and click 'send'");
+            },
+            "1|1,2|0,5|1"),
+        new Command("GetFile",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to desired file location and click 'send'");
+            },
+            "/usr/bin/aaa.txt"),
+        new BlobCommand("PutFile",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to desired folder location, select a file and click 'send'");
+            },
+            "/usr/local/"),
+        new Command("GetWebCam",
+            function(obj) {
+                setCommand(obj);
+                compileAndSendCommand();
+            }),
+        new Command("ShowInformer",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to desired text message and click 'send'");
+            },
+            "Всем делать уроки!"),
+        new Command("GetAudio",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to desired length of the record and click 'send'");
+            },
+            3),
+        new Command("SwitchOnTv",
+            function(obj) {
+                setCommand(obj);
+                compileAndSendCommand();
+            }),
+        new Command("SwitchOffTv",
+            function(obj) {
+                setCommand(obj);
+                compileAndSendCommand();
+            }),
+        new BlobCommand("ShowPicture",
+            function(obj) {
+                setCommand(obj);
+                compileAndSendCommand();
+            }),
+        new BlobCommand("PlayAudio",
+            function(obj) {
+                setCommand(obj);
+                compileAndSendCommand();
+            }),
+        new MediaCommand("PlayAudio",
+            function(obj, audioUrl) {
+                setCommand(obj);
+                compileAndSendCommand();
+                audioPlayer.src = audioUrl;
+                //const audio = new Audio(audioUrl);
+                //  audio.play();
+            })
+    ];
+    commands.forEach(function (cmd) {
+        cmd.createButton(document.getElementById("commandsDiv"));
+    });
+
+
+    var connectionUrl = document.getElementById("connectionUrl");
+    var connectButton = document.getElementById("connectButton");
+
+    var stateLabel = document.getElementById("stateLabel");
+    var commsLog = document.getElementById("commsLog");
+    var recordAudioButton = document.getElementById("RecordAudio");
+    var closeButton = document.getElementById("closeButton");
+
+    var socket;
+    var scheme = document.location.protocol === "https:" ? "wss" : "ws";
+    var port = document.location.port ? (":" + document.location.port) : "";
+    connectionUrl.value = scheme + "://" + document.location.hostname + port + "/PiHub?channelId=@(Context.Request.Query["channel"])&subscriberId=@(Context.Request.Query["subscriberId"])&key=@(Context.Request.Query["key"])";
+    function getMessageId() {
+        return Date.now().toString();
+    }
+
+    function updateState() {
+        function disable() {
+            sendMessage.disabled = true;
+            sendButton.disabled = true;
+            closeButton.disabled = true;
+        }
+        function enable() {
+            sendMessage.disabled = false;
+            sendButton.disabled = false;
+            closeButton.disabled = false;
+        }
+        connectionUrl.disabled = true;
+        connectButton.disabled = true;
+        if (!socket) {
+            disable();
+        } else {
+            switch (socket.readyState) {
+            case WebSocket.CLOSED:
+                stateLabel.innerHTML = "Closed";
+                disable();
+                connectionUrl.disabled = false;
+                connectButton.disabled = false;
+                break;
+            case WebSocket.CLOSING:
+                stateLabel.innerHTML = "Closing...";
+                disable();
+                break;
+            case WebSocket.CONNECTING:
+                stateLabel.innerHTML = "Connecting...";
+                disable();
+                break;
+            case WebSocket.OPEN:
+                stateLabel.innerHTML = "Open";
+                enable();
+                break;
+            default:
+                stateLabel.innerHTML = "Unknown WebSocket State: " + htmlEscape(socket.readyState);
+                disable();
+                break;
+            }
+        }
+    }
+
+
+    function playSound(base64string) {
+        audioPlayer.src = "data:audio/wav;base64,"+base64string;
+    }
+
+    closeButton.onclick = function () {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert("socket not connected");
+        }
+        socket.close(1000, "Closing from client");
+    };
+
+    function logCommunication(direction,payload) {
+        commsLog.innerHTML += (direction ? "Cl->Srv" : "Srv->Cl") + payload+"<br>";
+    }
+    sendButton.onclick = function () {
+        compileAndSendCommand();
+    };
+    connectButton.onclick = function () {
+        stateLabel.innerHTML = "Connecting";
+        socket = new WebSocket(connectionUrl.value);
+        socket.onopen = function (event) {
+            updateState();
+            logCommunication(true, "---Connection opened---");
+        };
+        socket.onclose = function (event) {
+            updateState();
+            logCommunication(true, "Connection closed. Code: " + htmlEscape(event.code) + ". Reason: " + htmlEscape(event.reason));
+        };
+        socket.onerror = updateState;
+        socket.onmessage = function (event) {
+            var resp = JSON.parse(event.data);
+            displayFolderContent(resp);
+            if (resp.blob !== undefined) {
+                if (resp.blob.name.toLowerCase().endsWith("jpg") || resp.blob.name.toLowerCase().endsWith("png") || resp.blob.name.toLowerCase().endsWith("gif"))
+                    document.getElementById("picture").src = "data:image/png;base64," + resp.blob.content;
+                else if (resp.blob.name.toLowerCase().endsWith("wav"))
+                    playSound(resp.blob.content);
+                else
+                    saveFromBlob(document.getElementById("fileLinkHolder"), resp.blob);
+                resp.blob = undefined;
+            }
+            displayHWIO(resp);
+            displayEnvAndSysIndo(resp);
+            logCommunication(false,event.data.substring(1,300));
+        };
+    };
+
+
+    function displayEnvAndSysIndo(resp) {
+        env = resp.environment;
+        if (env !== undefined) {
+            document.getElementById("envCell").innerHTML = "Temp:" + env.temperature + "C Humidity: " + env.humidity + "%";
+        }
+        sys = resp.sysInfo;
+        if (sys !== undefined) {
+
+            document.getElementById("sysCell").innerHTML = "CPU Temp:"+sys.temp+"C RAM Usage: "+sys.ram +"% CPU Usage:"+sys.cpu +"% HDD usage: "+sys.disk +"%";
+        }
+    }
+    function htmlEscape(str) {
+        return str.toString()
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function displayHWIO(resp) {
+        if (resp.gpIoPins == undefined) return;
+        pins = resp.gpIoPins;
+        document.getElementById("hwiopanel").innerText = pins;
+    }
+
+    function displayFolderContent(message) {
+        if (message.directory === undefined) return;
+        placeholder = document.getElementById("folderInfo");
+        placeholder.innerHTML = "";
+        var t = document.createElement("header");
+        t.innerHTML = "folder location:";
+       
+
+        var idx = 0;
+        var location = message.directory.location;
+
+        while(idx<location.length) {
+
+            idx2 = location.indexOf("/", idx+1);
+            if(idx2<0) idx2=location.length;
+            var seg = location.substring(idx, idx2);
+            var fullseg=location.substring(0,idx2);
+            idx = idx2;
+            var link = createLinkToFolder(fullseg, true, `[${seg}]`);
+              t.appendChild(link);
+        } 
+        placeholder.appendChild(t);
+
+        var br = document.createElement("br");
+        placeholder.appendChild(br);
+
+        
+        message.directory.files.forEach(function(f) {
+            var link = createLinkToFolder(
+                message.directory.location + "/" + f.name,
+                f.isDirectory,
+                formatFileName(f));
+            placeholder.appendChild(link);
+            var br = document.createElement("br");
+            placeholder.appendChild(br);
+
+        });
+    }
+
+    function formatFileName(f) {
+        var res = "";
+        if (f.isDirectory) {
+            res = `[${f.name}] <DIR> ${formatMMDDYYYY(f.date)}`;
+        } else {
+            res = `${f.name} ${f.size.toString()} ${formatMMDDYYYY(f.date)}`;
+        }
+        return res;
+    }
+    function createLinkToFolder(fullname, isdirectory, caption) {
+        var link = document.createElement("a"); // Or maybe get it from the current document
+        var t = document.createTextNode(caption);
+        link.appendChild(t);
+
+        //link.href = "#";
+        link.dataset.path = fullname;
+        link.dataset.isdirectory = isdirectory;
+        link.onclick = (ff) => {
+            command = this.commands.find(function(c) {
+                return c.commandName == (ff.currentTarget.dataset.isdirectory == "true" ? "GetFolder" : "GetFile");
+            }).createBaseMessage([this.getPiId()])
+            document.getElementById("commandValue").value = ff.currentTarget.dataset.path;
+            compileAndSendCommand();
+            return false;
+        };
+        return link;
+    }
+
+    function formatMMDDYYYY(dateStr) {
+        var date = new Date(dateStr);
+        return (date.getMonth() + 1) + 
+            "/" +  date.getDate() +
+            "/" +  date.getFullYear();
+    }
+
+</script>
+</body>
+</html>
