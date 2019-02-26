@@ -63,7 +63,7 @@ Install all necessary python modules using PIP
 Install audacious on your PI to play audio or update mic.py to use another pi audio player
 Update settings.py with your channel name and key. Update gateway base URL if you want to use your one gateway.
 
-Some commands/broadcasts requires microphone, dht11 thermometer, and camera attached to the raspberry PI. If you do not have it, please update the main  function in pihub.py to remove 
+Some commands/broadcasts requires microphone, dht11 thermometer(data is on pin14. Update pin in thermometer.py if necessary), and camera attached to the raspberry PI. If you do not have it, please update the main  function in pihub.py to remove 
 initWebcamBroadcast() for the webcam initEnvBroadcast() and for the thermometer.
 
 You can use https://puhub.azurewebsites.net as a hub or deploy standalone WebSocket server.
