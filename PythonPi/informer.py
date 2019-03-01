@@ -10,28 +10,40 @@ picture=None
 
 
 def getPicture(imageUrl):
-    pilImage = rotateByExif(Image.open(imageUrl))
     global picture
     basewidth = 1024
     baseheight = 768
-    if picture is None:
-        app = App(title="Picture")
-        app.width=basewidth
-        app.height=baseheight
-
-        if(pilImage.size[1]>pilImage.size[0]):
-            basewidth=int(float(baseheight)/float(pilImage.size[1])*float(pilImage.size[0]))
-
-        
-        wpercent = (basewidth/float(pilImage.size[0]))
-        hsize = int((float(pilImage.size[1])*float(wpercent)))
-        rpil = pilImage.resize((basewidth,hsize), Image.ANTIALIAS)
-
-        picture = Picture(app,image=rpil)
-        app.display()
-        picture=None
-        app=None
+    app = App(title="Picture")
+    app.width=basewidth
+    app.height=baseheight
+    app.tk.attributes("-fullscreen",True)
+    drawPicture(imageUrl, app)
+    app.display()
+    picture=None
+    app=None
     return picture
+
+def drawPicture(imageUrl,master):
+    basewidth = 1024
+    baseheight = 768
+    global picture
+    if picture is not None:
+        master=picture.master
+        picture.destroy()
+        master.focus()
+        
+    pilImage = rotateByExif(Image.open(imageUrl))
+    if(pilImage.size[1]>pilImage.size[0]):
+            basewidth=int(float(baseheight)/float(pilImage.size[1])*float(pilImage.size[0]))
+        
+    wpercent = (basewidth/float(pilImage.size[0]))
+    hsize = int((float(pilImage.size[1])*float(wpercent)))
+    rpil = pilImage.resize((basewidth,hsize), Image.ANTIALIAS)
+
+    picture = Picture(master,image=rpil)
+    return picture
+    
+    
 
 def rotateByExif(image):
     try:
@@ -59,6 +71,7 @@ def getBanner(text):
         app = App(title="Information")
         app.width=1200
         app.height=1090
+        app.tk.attributes("-fullscreen",True)
         banner=Text(app,text=text)
         banner.size=50
         banner.text_color="red"
@@ -76,15 +89,15 @@ def updateBanner(text):
 
     if banner is not None:
         banner.value=text
+        banner.mster.focus()
 
 def updatePicture(filename):
     global picture
     if picture is None:
         getPicture(filename)
-    if picture is not None:
+    else:
         master=picture.master
-        picture.destroy()
-        picture = Picture(master, image=filename)
+        drawPicture(filename, master)
         
 
 def showPicture(filename):
@@ -129,5 +142,8 @@ def switchOnTv():
 
 #time.sleep(1)
 #showPicture("picture.JPG")
+#time.sleep(5)
+
+#updatePicture("picture.jpg")
 #time.sleep(5)
 #showPicture("PiHubShot.jpg")
