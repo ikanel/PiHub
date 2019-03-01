@@ -89,7 +89,7 @@ def updateBanner(text):
 
     if banner is not None:
         banner.value=text
-        banner.mster.focus()
+        banner.master.focus()
 
 def updatePicture(filename):
     global picture
