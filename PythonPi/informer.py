@@ -3,14 +3,14 @@ import time
 import threading
 from guizero import App, Text,Picture
 import simpleaudio.functionchecks as fc
-from PIL import ImageFile,Image
+from PIL import ImageFile,Image,ExifTags
 
 banner=None
 picture=None
 
 
 def getPicture(imageUrl):
-    pilImage = Image.open(imageUrl)
+    pilImage = rotateByExif(Image.open(imageUrl))
     global picture
     basewidth = 1024
     baseheight = 768
@@ -32,6 +32,25 @@ def getPicture(imageUrl):
         picture=None
         app=None
     return picture
+
+def rotateByExif(image):
+    try:
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation]=='Orientation':
+                break
+        exif=dict(image._getexif().items())
+
+        if exif[orientation] == 3:
+            image=image.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            image=image.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            image=image.rotate(90, expand=True)
+        
+    except (AttributeError, KeyError, IndexError):
+    # cases: image don't have getexif
+        pass
+    return image
 
 def getBanner(text):
     
@@ -109,6 +128,6 @@ def switchOnTv():
 #showImageWithViewer("picture.JPG")
 
 #time.sleep(1)
-#showPicture("picture.jpg")
+#showPicture("picture.JPG")
 #time.sleep(5)
 #showPicture("PiHubShot.jpg")
