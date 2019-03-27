@@ -190,6 +190,18 @@
                 setCommand(obj);
                 compileAndSendCommand();
             }),
+       
+        new Command("SetWebcamBroadcastInterval",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to desired timeout between webcam broadcasts is seconds and click  'send'");
+            },60),
+        new Command("SetEnvironmentBroadcastInterval",
+            function(obj) {
+                setCommand(obj);
+              alert("Set value attribute to desired timeout between temperature measurements in seconds and click 'send'");
+            },60),
+       
         new BlobCommand("ShowPicture",
             function(obj) {
                 setCommand(obj);

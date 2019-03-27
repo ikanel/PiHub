@@ -1,10 +1,8 @@
 from os import listdir
-import time
 import datetime
-import json
-from os.path import isfile, join,getsize,getmtime
+from os.path import isfile, join, getsize, getmtime
 
-   
+
 def get_folder_content(path):
     for f in listdir(path):
         fullname = join(path, f)
@@ -13,5 +11,3 @@ def get_folder_content(path):
         date = datetime.datetime.fromtimestamp(getmtime(fullname)).isoformat()
         filename = f
         yield {"isDirectory": not is_file, "name": filename, "date": date, "size": size}
-        
-
