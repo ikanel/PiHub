@@ -8,7 +8,7 @@ namespace Messaging.Messages {
 	public class FileInfo {
 		public Boolean IsDirectory;
 		public String Name;
-		public int Size;
+		public long Size;
         public DateTime Date;
     }//end FileInfo
 

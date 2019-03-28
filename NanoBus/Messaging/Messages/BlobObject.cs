@@ -10,7 +10,7 @@ namespace Messaging.Messages {
 		public byte[] Content;
 		public DateTime Date;
 		public string Name;
-		public int Size;
+		public long Size;
 
 	}//end BlobObject
 
