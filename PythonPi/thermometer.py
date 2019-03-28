@@ -27,9 +27,9 @@ def getValue():
         return None
 
 
-async def pollThermometer(timeout, callback):
+async def pollThermometer(callback):
     global stopped
-    print("Arming thermometer polling every {0} seconds".format(timeout))
+    print("Arming thermometer polling every {0} seconds".format(settings.environmentBroadcastinterval))
     while settings.enable_environment_broadcast:
 
         result = getValue()
@@ -40,8 +40,7 @@ async def pollThermometer(timeout, callback):
         else:
             print("Cannot read thermometer")
 
-        if timeout > 0:
-            await asyncio.sleep(timeout)
+        await asyncio.sleep(settings.environmentBroadcastinterval)
 
 
 async def test(result):

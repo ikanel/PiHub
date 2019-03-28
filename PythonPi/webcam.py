@@ -15,15 +15,14 @@ def makeWebCamShot(filename, width=640, height=480, warmup=1):
         camera.capture(filename)
 
 
-async def pollWebcam(timeout, callback):
+async def pollWebcam(callback):
     global stopped
-    print("Arming webcam polling every {0} seconds".format(timeout))
+    print("Arming webcam polling every {0} seconds".format(settings.webcamBroadcastInterval))
     while settings.enable_webcam_broadcast:
         filename = "PiHubAutoShot.jpg"
         makeWebCamShot(filename, 320, 240)
         await callback(filename)
-        if timeout>0:
-            await asyncio.sleep(timeout)
+        await asyncio.sleep(settings.webcamBroadcastInterval)
 
     print("WebCam Thread cancelled ")
 

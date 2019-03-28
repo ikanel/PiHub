@@ -22,13 +22,13 @@ async def initEnvBroadcast():
     print("initializing environment broadcast")
     if settings.enable_environment_broadcast:
         print("Environment broadcast has started")
-        await thermo.pollThermometer(settings.environmentBroadcastinterval, broadcastEnvironmentMessage)
+        await thermo.pollThermometer(broadcastEnvironmentMessage)
 
 
 async def initWebcamBroadcast():
     if settings.enable_webcam_broadcast:
         print("Webcam broadcast has started")
-        await webcam.pollWebcam(settings.webcamBroadcastInterval, broadcastWebcamMessage)
+        await webcam.pollWebcam(broadcastWebcamMessage)
 
 
 async def run(uri):
@@ -116,11 +116,10 @@ def processIncomingMessage(message):
             outputMessage = defaultResponse(message, informer.switchOnTv)
 
         if name == "SetWebcamBroadcastInterval":
-            outputMessage = defaultResponse(message, setEbcamBroadcastInterval, message["value"])
+            outputMessage = defaultResponse(message, setWebcamBroadcastInterval, int(message["value"]))
 
         if name == "SetEnvironmentBroadcastInterval":
-            outputMessage = defaultResponse(message, setEnvironmentBroadcastInterval, message["value"])
-
+            outputMessage = defaultResponse(message, setEnvironmentBroadcastInterval, int(message["value"]))
         if name == "SwitchOffTv":
             outputMessage = defaultResponse(message, informer.switchOffTv)
         if name == "GetAudio":
@@ -139,10 +138,12 @@ def processIncomingMessage(message):
 
 
 def setEnvironmentBroadcastInterval(interval):
-    settings.environmentBroadcastinterval=interval
+    settings.environmentBroadcastinterval = interval
 
-def setEbcamBroadcastInterval(interval):
-    settings.webcamBroadcastInterval=interval
+
+def setWebcamBroadcastInterval(interval):
+    settings.webcamBroadcastInterval = interval
+
 
 def defaultResponse(message, func, *args):
     func(*args)
@@ -217,7 +218,6 @@ def prepareGetGpioPinsResponseMessage(message):
     outputMessage["gpIoPins"] = gpio.get_io_pins(pins)
     return outputMessage
 
-
 def prepareAudioMessage(message):
     filename = mic.getAudio(message["value"])
     outputMessage = prepareDefaultResponse(message)
@@ -254,8 +254,8 @@ def prepareErrorResponse(message, error):
 def prepareDefaultResponse(message):
     outputMessage = {
         "messageType": "Response",
-        "id": "1",
-        "originator": "3",
+        "id": time.time(),
+        "originator": settings.subscriberId,
         "name": message["name"] + "Response",
         "recipients": [message["originator"]],
         "response":
@@ -270,6 +270,5 @@ def prepareDefaultResponse(message):
 
 async def main():
     await asyncio.gather(run(settings.baseUri), initEnvBroadcast(), initWebcamBroadcast())
-
 
 asyncio.run(main())
