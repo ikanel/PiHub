@@ -13,7 +13,7 @@ namespace WebSocketASPNetCore
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
-                .UseUrls("http://192.168.1.8:12125", "http://localhost:12125")
+                .UseUrls("http://192.168.1.13:12125", "http://localhost:12125")
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

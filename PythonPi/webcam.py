@@ -20,7 +20,7 @@ async def pollWebcam(callback):
     print("Arming webcam polling every {0} seconds".format(settings.webcamBroadcastInterval))
     while settings.enable_webcam_broadcast:
         filename = "PiHubAutoShot.jpg"
-        makeWebCamShot(filename, 320, 240)
+        makeWebCamShot(filename, 640, 480)
         await callback(filename)
         await asyncio.sleep(settings.webcamBroadcastInterval)
 

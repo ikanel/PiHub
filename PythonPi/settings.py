@@ -1,10 +1,4 @@
-# demo
-channelId="demo"
-subscriberId="pi"
-gateway="wss://pihubdemo.azurewebsites.net/PiHub"
-key="demo"
-
-
+import privatesettings
 # thermometer
 thermometer_data_pin = 14
 
@@ -19,4 +13,4 @@ webcamBroadcastInterval = 60
 microphone_device_index = 2
 microphone_rate = 44100
 
-baseUri = f'{gateway}?channelId={channelId}&subscriberId={subscriberId}&key={key}'
+baseUri = f'{privatesettings.gateway}?channelId={privatesettings.channelId}&subscriberId={privatesettings.subscriberId}&key={privatesettings.key}'
