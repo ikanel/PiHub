@@ -14,6 +14,7 @@ import filemanager as fm
 import gpio
 import os
 import settings
+import privatesettings
 
 websocket = None
 
@@ -55,7 +56,7 @@ def prepareBroadcastMessage(name):
     outputMessage = {
         "messageType": "Broadcast",
         "id": time.time(),
-        "originator": settings.subscriberId,
+        "originator": privatesettings.subscriberId,
         "name": name
     }
     return outputMessage
@@ -255,7 +256,7 @@ def prepareDefaultResponse(message):
     outputMessage = {
         "messageType": "Response",
         "id": time.time(),
-        "originator": settings.subscriberId,
+        "originator": privatesettings.subscriberId,
         "name": message["name"] + "Response",
         "recipients": [message["originator"]],
         "response":
