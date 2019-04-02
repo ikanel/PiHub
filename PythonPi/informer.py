@@ -1,6 +1,6 @@
 import os
 import threading
-from guizero import App, Text, Picture
+from guizero import App, Text, Picture, TextBox
 import simpleaudio.functionchecks as fc
 from PIL import Image, ExifTags
 
@@ -71,8 +71,9 @@ def getBanner(text):
         app.width = 1200
         app.height = 1090
         app.tk.attributes("-fullscreen", True)
-        banner = Text(app, text=text)
-        banner.size = 50
+        banner = TextBox(app, text=text, width="fill", height="fill", multiline=True, align="top")
+
+        banner.text_size = 50
         banner.text_color = "red"
         app.display()
         banner = None
