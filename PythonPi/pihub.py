@@ -15,6 +15,7 @@ import gpio
 import os
 import settings
 import privatesettings
+import remotecommand
 
 websocket = None
 
@@ -98,37 +99,38 @@ def processIncomingMessage(message):
     outputMessage = None
     name = message["name"]
 
+    value = message["value"]
+    intvalue = None
+    if value.isdigit():
+        intvalue = int(value)
+
+    handlers = {
+
+        "SetGpioPins": [prepareSetGpioPinsResponseMessage],
+        "GetGpioPins": [prepareGetGpioPinsResponseMessage],
+        "GetFolder": [prepareGetFolderResponseMessage],
+        "GetFile": [prepareGetFileResponseMessage],
+        "PutFile": [preparePutFileResponseMessage],
+        "GetWebCam": [prepareWebCamResponseMessage],
+        "ShowInformer": [defaultResponse, informer.showBanner, value],
+        "SwitchOnTv": [defaultResponse, informer.switchOnTv],
+        "SetWebcamBroadcastInterval": [defaultResponse, setWebcamBroadcastInterval, intvalue],
+        "SetEnvironmentBroadcastInterval": [defaultResponse, setEnvironmentBroadcastInterval, intvalue],
+        "SwitchOffTv": [defaultResponse, informer.switchOffTv],
+        "GetAudio": [prepareAudioMessage],
+        "PlayAudio": [playAudioMessage],
+        "ShowPicture": [showPicture],
+        "RemoteCommand": [executeRemoteCommand]
+    }
+
     try:
-        if name == "SetGpioPins":
-            outputMessage = prepareSetGpioPinsResponseMessage(message)
-        if name == "GetGpioPins":
-            outputMessage = prepareGetGpioPinsResponseMessage(message)
-        if name == "GetFolder":
-            outputMessage = prepareGetFolderResponseMessage(message)
-        if name == "GetFile":
-            outputMessage = prepareGetFileResponseMessage(message)
-        if name == "PutFile":
-            outputMessage = preparePutFileResponseMessage(message)
-        if name == "GetWebCam":
-            outputMessage = prepareWebCamResponseMessage(message)
-        if name == "ShowInformer":
-            outputMessage = defaultResponse(message, informer.showBanner, message["value"])
-        if name == "SwitchOnTv":
-            outputMessage = defaultResponse(message, informer.switchOnTv)
+        if name not in handlers:
+            outputMessage = prepareErrorResponse(message, "Unknown command")
+        else:
+            command = handlers[name]
+            func=command[0]
+            outputMessage = func(message, *(command[1:]))
 
-        if name == "SetWebcamBroadcastInterval":
-            outputMessage = defaultResponse(message, setWebcamBroadcastInterval, int(message["value"]))
-
-        if name == "SetEnvironmentBroadcastInterval":
-            outputMessage = defaultResponse(message, setEnvironmentBroadcastInterval, int(message["value"]))
-        if name == "SwitchOffTv":
-            outputMessage = defaultResponse(message, informer.switchOffTv)
-        if name == "GetAudio":
-            outputMessage = prepareAudioMessage(message)
-        if name == "PlayAudio":
-            outputMessage = playAudioMessage(message)
-        if name == "ShowPicture":
-            outputMessage = showPicture(message)
     except OSError as err:
         outputMessage = prepareErrorResponse(message, "OS error: {0}".format(err))
 
@@ -136,6 +138,17 @@ def processIncomingMessage(message):
         outputMessage = prepareErrorResponse(message, "OS error: {0}".format(err))
 
     return outputMessage
+
+
+def executeRemoteCommand(message):
+    if settings.enable_remote_commands:
+        outputMessage = prepareDefaultResponse(message)
+        cmdresult = remotecommand.execute([message["value"]])
+        outputMessage["value"] = cmdresult
+        return outputMessage
+    else:
+        outputMessage = prepareErrorResponse(message, "Remote commands is not enable on this host")
+        return outputMessage
 
 
 def setEnvironmentBroadcastInterval(interval):
@@ -219,6 +232,7 @@ def prepareGetGpioPinsResponseMessage(message):
     outputMessage["gpIoPins"] = gpio.get_io_pins(pins)
     return outputMessage
 
+
 def prepareAudioMessage(message):
     filename = mic.getAudio(message["value"])
     outputMessage = prepareDefaultResponse(message)
@@ -271,5 +285,6 @@ def prepareDefaultResponse(message):
 
 async def main():
     await asyncio.gather(run(settings.baseUri), initEnvBroadcast(), initWebcamBroadcast())
+
 
 asyncio.run(main())

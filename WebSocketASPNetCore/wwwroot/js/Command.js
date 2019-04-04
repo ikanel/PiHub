@@ -1,8 +1,10 @@
 ﻿class Command {
-    constructor(name, handler, value = undefined) {
+    constructor(name, caption, handler, value = undefined, description=undefined) {
         this.commandName = name;
         this.handler = handler;
         this.value = value;
+        this.description = description;
+        this.caption = caption;
     }
     createBaseMessage(recepientId) {
         var obj = { Id: getMessageId(), MessageType: "Command", Name: this.commandName, Recipients: recepientId };
@@ -15,8 +17,9 @@
     }
 
    createButton(container) {
-        var btn = document.createElement("BUTTON");
-        var t = document.createTextNode(this.commandName);
+       var btn = document.createElement("BUTTON");
+       btn.title = this.description;
+        var t = document.createTextNode(this.caption);
         btn.appendChild(t);
 
        btn.onclick =

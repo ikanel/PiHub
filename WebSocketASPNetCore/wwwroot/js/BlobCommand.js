@@ -1,6 +1,6 @@
 ﻿class BlobCommand extends Command {
-    constructor(name, handler) {
-        super(name, handler, undefined);
+    constructor(name,caption, handler, description=undefined) {
+        super(name,caption, handler, undefined,description );
       }
 
     createBlob(filename, size, content) {
@@ -41,8 +41,9 @@
     }
     createButton(container) {
         var btn = document.createElement("BUTTON");
-        var t = document.createTextNode(this.commandName);
+        var t = document.createTextNode(this.caption);
         btn.appendChild(t);
+        btn.title = this.description;
 
         btn.onclick =
             () => {

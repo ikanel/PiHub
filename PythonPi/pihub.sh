@@ -1,4 +1,5 @@
 #!/bin/bash
+cd /home/pi/Experiments
 while true;
 do
   python3.7 pihub.py && break;

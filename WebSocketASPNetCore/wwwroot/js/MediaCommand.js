@@ -1,6 +1,6 @@
 ﻿class MediaCommand extends BlobCommand {
-    constructor(name, handler) {
-        super(name, handler, undefined, false);
+    constructor(name, caption, handler, description=undefined) {
+        super(name, caption, handler, undefined, false,description);
         this.isStarted = false;
     }
 
@@ -43,10 +43,11 @@
                     });
 
             });
-    };
+    }
 
     createButton(container) {
         var btn = document.createElement("BUTTON");
+        btn.title = this.description;
         var t = document.createTextNode("Record Audio");
         btn.appendChild(t);
 
@@ -58,9 +59,9 @@
                 } else {
                     btn.innerText = "Stop Audio Recording";
                     this.startMediaRecorder();
-                   
+
                 }
-            }
+            };
         container.appendChild(btn);
     }
 }

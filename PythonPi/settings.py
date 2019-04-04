@@ -13,4 +13,8 @@ webcamBroadcastInterval = 60
 microphone_device_index = 2
 microphone_rate = 44100
 
+#RPC
+enable_remote_commands = True
+rpc_command_timeout = 30
+
 baseUri = f'{privatesettings.gateway}?channelId={privatesettings.channelId}&subscriberId={privatesettings.subscriberId}&key={privatesettings.key}'

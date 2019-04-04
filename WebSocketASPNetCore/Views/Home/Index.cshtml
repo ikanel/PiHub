@@ -5,6 +5,10 @@
     <title>PiHub demostrator</title>
     <style>
 
+        h1
+        {
+            font-family: monospace;
+        }
         section {
             width: 99%;
             border: 0.1px solid black;
@@ -53,7 +57,7 @@
     <script src="js/blobs.js"></script>
 </head>
 <body>
-    <h1>PiHub Demonstrator</h1>
+    <h1>PiHub</h1>
     <p id="stateLabel">Ready to connect...</p>
     <div>
         <label for="connectionUrl">WebSocket Server URL:</label>
@@ -73,8 +77,7 @@
     <div id="commandsDiv">
       
         <input type="file" id="file" />
-        
-        <button id="sendButton" type="submit" disabled>Send</button>
+ <button id="sendButton" type="submit" disabled>Send</button>
         <br />
     </div>
     <section id="audioPlayerSection">
@@ -132,87 +135,96 @@
     Command.prototype.recipientId = getPiId().split(",");
     Command.prototype.files = document.getElementById('file');
     var commands = [
-        new Command("GetFolder",
+        new Command("GetFolder","Get directory from Pi",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
                 //alert("Set value attribute to desired folder location and click 'send'");
             },
-            "/"),
-        new Command("GetGpioPins",
+            "/",
+            "The command will load the content of the directory given in value field to the folder panel."
+            ),
+        new Command("GetGpioPins","Get GPIO Pins status",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to the comma-separated list of pins to be requested and click 'send'");
             },
             "1,2,3,4,5,6,7"),
-        new Command("SetGpioPins",
+        new Command("SetGpioPins", "Set GPIO pins",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to the pins:0/1 and click 'send'");
             },
             "1|1,2|0,5|1"),
-        new Command("GetFile",
+        new Command("GetFile", "Download file from Pi",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to desired file location and click 'send'");
             },
             "/usr/bin/aaa.txt"),
-        new BlobCommand("PutFile",
+        new BlobCommand("PutFile", "Upload file to Pi",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to desired folder location, select a file and click 'send'");
             },
             "/usr/local/"),
-        new Command("GetWebCam",
+        new Command("GetWebCam", "Get image from Pi Camera",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
             }),
-        new Command("ShowInformer",
+        new Command("ShowInformer","Show informer message",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to desired text message and click 'send'");
             },
             "Всем делать уроки!"),
-        new Command("GetAudio",
+        new Command("GetAudio","Record and get the sound form Pi",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to desired length of the record and click 'send'");
             },
             3),
-        new Command("SwitchOnTv",
+        new Command("RemoteCommand","Run shell command",
+            function(obj) {
+                setCommand(obj);
+                alert("Set value attribute to desired command and click 'send'. Yoo will find the command output in the logs window.");
+            },
+            3,
+            "The command will be executed on Pi. The response will be displayed at the Logs window. This is a blocking command."),
+        new Command("SwitchOnTv","Switch TV off",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
             }),
-        new Command("SwitchOffTv",
+        new Command("SwitchOffTv","Switch TV on",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
             }),
        
-        new Command("SetWebcamBroadcastInterval",
+        new Command("SetWebcamBroadcastInterval", "Set interval for WebCam",
             function(obj) {
                 setCommand(obj);
                 alert("Set value attribute to desired timeout between webcam broadcasts is seconds and click  'send'");
             },60),
-        new Command("SetEnvironmentBroadcastInterval",
+        new Command("SetEnvironmentBroadcastInterval","Set interval for temperature data",
             function(obj) {
                 setCommand(obj);
               alert("Set value attribute to desired timeout between temperature measurements in seconds and click 'send'");
             },60),
        
-        new BlobCommand("ShowPicture",
+        new BlobCommand("ShowPicture","Display a picture on TV",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
             }),
-        new BlobCommand("PlayAudio",
+        new BlobCommand("PlayAudio","Play audio on Pi",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
             }),
-        new MediaCommand("PlayAudio",
+        new MediaCommand("PlayAudio","Record and send audio to Pi",
             function(obj, audioUrl) {
                 setCommand(obj);
                 compileAndSendCommand();

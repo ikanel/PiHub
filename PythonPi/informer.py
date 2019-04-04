@@ -129,3 +129,4 @@ def switchOffTv():
 def switchOnTv():
     os.system('echo "on 0" | cec-client RPI -s -d 1')
     os.system('echo "as" | cec-client RPI -s -d 1')
+
