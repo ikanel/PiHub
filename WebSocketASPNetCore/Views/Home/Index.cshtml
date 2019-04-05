@@ -121,7 +121,7 @@
         }
         var commStr = JSON.stringify(command);
         socket.send(commStr);
-
+        displayRemoteCommand(command);
         logCommunication(true, commStr.substring(0, 200));
 
     }
@@ -188,10 +188,10 @@
         new Command("RemoteCommand","Run shell command",
             function(obj) {
                 setCommand(obj);
-                alert("Set value attribute to desired command and click 'send'. Yoo will find the command output in the logs window.");
+                alert("Set value attribute to desired command and click 'send'. Yoo will find the command output in the folder window.");
             },
-            3,
-            "The command will be executed on Pi. The response will be displayed at the Logs window. This is a blocking command."),
+            "ls",
+            "The command will be executed on Pi. The response will be displayed at the folder window. This is a blocking command."),
         new Command("SwitchOnTv","Switch TV off",
             function(obj) {
                 setCommand(obj);
@@ -330,6 +330,7 @@
         socket.onmessage = function (event) {
             var resp = JSON.parse(event.data);
             displayFolderContent(resp);
+            displayRemoteCommandResponse(resp);
             if (resp.blob !== undefined) {
                 if (resp.blob.name.toLowerCase().endsWith("jpg") || resp.blob.name.toLowerCase().endsWith("png") || resp.blob.name.toLowerCase().endsWith("gif"))
                     document.getElementById("picture").src = "data:image/png;base64," + resp.blob.content;
@@ -370,6 +371,26 @@
         if (resp.gpIoPins == undefined) return;
         pins = resp.gpIoPins;
         document.getElementById("hwiopanel").innerText = pins;
+    }
+
+    function checkMessageName(message,name) {
+        return message != undefined && message != null && (message.name === name || message.Name === name);
+    }
+    function displayRemoteCommand(message) {
+        if (!checkMessageName(message, "RemoteCommand")) return;
+        placeholder = document.getElementById("folderInfo");
+        placeholder.innerHTML = "";
+        var t = document.createElement("header");
+        t.innerHTML = message.value;
+
+        placeholder.appendChild(t);
+    }
+    function displayRemoteCommandResponse(message) {
+        if (!checkMessageName(message, "RemoteCommandResponse")) return;
+        placeholder = document.getElementById("folderInfo");
+        var br = document.createElement("br");
+        placeholder.appendChild(br);
+        placeholder.innerHTML += message.value.replace(/\n/g, "<br />");
     }
 
     function displayFolderContent(message) {

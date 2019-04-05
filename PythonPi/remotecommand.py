@@ -5,9 +5,8 @@ import settings
 def execute(command):
     try:
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-        return str(p.communicate(timeout=settings.rpc_command_timeout))
+        return p.communicate(timeout=settings.rpc_command_timeout)[0].decode("utf-8")
     except:
-        return "Unexpected error:", str(sys.exc_info()[0])
+        return "Unexpected error:", (sys.exc_info()[0]).decode("utf-8")
 
-
-#print(execute(["ping ya.ru"]))
+print(execute(["ls"]))
