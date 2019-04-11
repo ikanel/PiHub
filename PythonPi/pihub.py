@@ -38,8 +38,8 @@ async def run(uri):
     print("Openning websocket connection to: " + settings.baseUri)
     async with websockets.connect(uri, max_size=1024 * 1024 * 10) as ws:
         websocket = ws
+        print("Listening to websocket on " + settings.baseUri)
         while True:
-            print("Listening to websocket on " + settings.baseUri)
             messageStr = await websocket.recv()
             print("received message")
             message = json.loads(messageStr)
@@ -50,7 +50,7 @@ async def run(uri):
                 await websocket.send(jsstr)
                 print(jsstr[0:100])
             else:
-                print("processing error: null output from the inbound message processor")
+                print("No response: null output from the inbound message processor")
 
 
 def prepareBroadcastMessage(name):
@@ -98,7 +98,10 @@ def processIncomingMessage(message):
     # print(message)
     outputMessage = None
     name = message["name"]
-
+    messageType= message["messageType"]
+    if messageType != "Command":
+        return None
+    
     value = message["value"]
     intvalue = None
     if value.isdigit():

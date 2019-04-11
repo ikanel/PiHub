@@ -107,6 +107,7 @@
 
     function setCommand(value) {
         command = value;
+        value.Recipients = getPiId();
         document.getElementById("sendMessage").innerHTML = JSON.stringify(value).substring(0, 300);
         if (value.value != undefined && value.value != null) {
             document.getElementById("commandValue").value = value.value;
@@ -126,13 +127,14 @@
 
     }
     function getPiId() {
-        return document.getElementById("piName").value;
+        return document.getElementById("piName").value.split(",");
+       
     }
     var sendMessage = document.getElementById("sendMessage");
     var sendButton = document.getElementById("sendButton");
     var audioPlayer = document.getElementById("audioPlayer");
 
-    Command.prototype.recipientId = getPiId().split(",");
+    Command.prototype.recipientId = getPiId();
     Command.prototype.files = document.getElementById('file');
     var commands = [
         new Command("GetFolder","Get directory from Pi",
@@ -192,12 +194,12 @@
             },
             "ls",
             "The command will be executed on Pi. The response will be displayed at the folder window. This is a blocking command."),
-        new Command("SwitchOnTv","Switch TV off",
+        new Command("SwitchOnTv","Switch TV on",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
             }),
-        new Command("SwitchOffTv","Switch TV on",
+        new Command("SwitchOffTv","Switch TV off",
             function(obj) {
                 setCommand(obj);
                 compileAndSendCommand();
