@@ -1,6 +1,6 @@
 # PiHub - controlling Raspberry Pi thru the  websockets
 
-PiHub controlling your Raspberry Pi with WebSockets
+![Image of PiHub](https://habrastorage.org/webt/zx/ir/hu/zxirhu07adcsei6kqxly7fkwuzs.gif)
 
 ### Prerequisites
 
