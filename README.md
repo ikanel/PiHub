@@ -1,4 +1,4 @@
-# Project Title
+# PiHub - controlling Raspberry Pi thru the  websockets
 
 PiHub controlling your Raspberry Pi with WebSockets
 
@@ -44,6 +44,7 @@ GetFolder command accept value as folder path. Example: /usr/bin
 * ShowPicture - Displays selected in file control picture on raspberry. Requires tv to be attached to the raspberry.
 * PlayAudio - Plays audio file selected by file control. Requires Tv or other audio device attached to Pi.
 * RecordAudio - Records audio in the browser and plays it on PI using an audio device attached.
+* RemoteCommand - Executes shell command on raspberry.
 
 * to be continued. Please contribute to this project to add more commands.
 
