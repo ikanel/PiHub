@@ -454,7 +454,7 @@
         link.onclick = (ff) => {
             command = this.commands.find(function(c) {
                 return c.commandName == (ff.currentTarget.dataset.isdirectory == "true" ? "GetFolder" : "GetFile");
-            }).createBaseMessage([this.getPiId()])
+            }).createBaseMessage(this.getPiId())
             document.getElementById("commandValue").value = ff.currentTarget.dataset.path;
             compileAndSendCommand();
             return false;
